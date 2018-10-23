@@ -20,7 +20,8 @@ class Sudoku:
 
         # convertion of these constraints to binary constraints
         self.binary_constraints = self.generate_binary_constraints(rule_constraints)
-        print(len(self.binary_constraints))
+        
+        self.isFinished()
 
     """
     generates all the coordinates of the cells
@@ -123,6 +124,19 @@ class Sudoku:
 
         return generated_binary_constraints
 
+    """
+    checks if the Sudoku's solution is finished
+    we loop through the possibilities for each cell
+    if all of them has only one, then the Sudoku is solved
+    """
+    def isFinished(self):
+
+        for coords, possibilities in self.possibilities.items():
+            print(coords, possibilities)
+            if len(possibilities) > 1:
+                return False
+        
+        return True
 
 grid = "000079065000003002005060093340050106000000000608020059950010600700600000820390000"
 sudoku = Sudoku(grid)
