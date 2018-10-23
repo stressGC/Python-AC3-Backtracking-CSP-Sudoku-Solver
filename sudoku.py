@@ -10,7 +10,7 @@ class Sudoku:
     def __init__(self, grid):
         self.cells = self.generate_coords()
         self.possibilities = self.generate_possibilities(grid)
-
+        self.constraints = self.generate_constraints()
 
     """
     generates all the coordinates of the cells
@@ -20,7 +20,7 @@ class Sudoku:
         all_cells_coords = []
 
         for a in COORDS:
-            
+
             for b in COORDS:
                 new_coords = a + b
                 all_cells_coords.append(new_coords)
@@ -47,6 +47,19 @@ class Sudoku:
                 possibilities[coords] = [int(grid_as_list[index])]
 
         return possibilities
+
+    def generate_constraints(self):
+        column_constraints = []
+        row_constraints = []
+
+        for row in COORDS:
+            column_constraints.append([col + row for col in COORDS])
+
+        for col in COORDS:
+            row_constraints.append([col + row for row in COORDS])
+
+        print(row_constraints + column_constraints)
+        return row_constraints + column_constraints
 
 grid = "000079065000003002005060093340050106000000000608020059950010600700600000820390000"
 sudoku = Sudoku(grid)
