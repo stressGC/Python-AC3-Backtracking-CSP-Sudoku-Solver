@@ -20,7 +20,7 @@ class Sudoku:
 
         # convertion of these constraints to binary constraints
         self.binary_constraints = self.generate_binary_constraints(rule_constraints)
-        
+
         self.isFinished()
 
     """
@@ -132,15 +132,7 @@ class Sudoku:
     def isFinished(self):
 
         for coords, possibilities in self.possibilities.items():
-            print(coords, possibilities)
             if len(possibilities) > 1:
                 return False
         
         return True
-
-grid = "000079065000003002005060093340050106000000000608020059950010600700600000820390000"
-sudoku = Sudoku(grid)
-
-# easy 000079065000003002005060093340050106000000000608020059950010600700600000820390000
-# medium 102004070000902800009003004000240006000107000400068000200800700007501000080400109
-# hard 002008050000040070480072000008000031600080005570000600000960048090020000030800900 
