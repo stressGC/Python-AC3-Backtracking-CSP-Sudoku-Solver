@@ -1,4 +1,4 @@
-import numpy as np
+import itertools
 
 COORDS = "123456789"
 
@@ -9,12 +9,18 @@ class Sudoku:
     """
     def __init__(self, grid):
 
+        # generation of all the coords of the grid
         self.cells = self.generate_coords()
 
+        # generation of all the possibilities for each one of these coords
         self.possibilities = self.generate_possibilities(grid)
 
+        # generation of the line / row / square constraints
         rule_constraints = self.generate_rules_constraints()
+
+        # convertion of these constraints to binary constraints
         self.binary_constraints = self.generate_binary_constraints(rule_constraints)
+        print(len(self.binary_constraints))
 
     """
     generates all the coordinates of the cells
@@ -90,10 +96,32 @@ class Sudoku:
     generates the binary constraints based on the rule constraints
     """
     def generate_binary_constraints(self, rule_constraints):
-        print(rule_constraints)
+        generated_binary_constraints = list()
 
+        # for each set of constraints
+        for constraint_set in rule_constraints:
 
+            binary_constraints = list()
 
+            # 2 because we want binary constraints
+            # solution taken from :
+            # https://stackoverflow.com/questions/464864/how-to-get-all-possible-combinations-of-a-list-s-elements
+            
+            #for tuple_of_constraint in itertools.combinations(constraint_set, 2):
+            for tuple_of_constraint in itertools.permutations(constraint_set, 2):
+                binary_constraints.append(tuple_of_constraint)
+
+            # for each of these binary constraints
+            for constraint in binary_constraints:
+
+                # check if we already have this constraint saved
+                # = check if already exists
+                # solution from https://stackoverflow.com/questions/7571635/fastest-way-to-check-if-a-value-exist-in-a-list
+                constraint_as_list = list(constraint)
+                if(constraint_as_list not in generated_binary_constraints):
+                    generated_binary_constraints.append([constraint[0], constraint[1]])
+
+        return generated_binary_constraints
 
 
 grid = "000079065000003002005060093340050106000000000608020059950010600700600000820390000"
