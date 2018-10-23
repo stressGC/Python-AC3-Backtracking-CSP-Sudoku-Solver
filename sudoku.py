@@ -21,8 +21,9 @@ class Sudoku:
         # convertion of these constraints to binary constraints
         self.binary_constraints = self.generate_binary_constraints(rule_constraints)
 
-        self.isFinished()
-
+        # generating all constraint-related cells for each of them
+        self.related_cells = self.generate_related_cells()
+        print(len(self.related_cells))
     """
     generates all the coordinates of the cells
     """
@@ -125,12 +126,30 @@ class Sudoku:
         return generated_binary_constraints
 
     """
+    generates the the constraint-related cell for each one of them
+    """
+    def generate_related_cells(self):
+        related_cells = dict()
+
+        #for each one of the 81 cells
+        for cell in self.cells:
+
+            related_cells[cell] = list()
+
+            # related cells are the ones that current cell has constraints with
+            for constraint in self.binary_constraints:
+                if cell == constraint[0]:
+                    related_cells[cell].append(constraint[1])
+
+        return related_cells
+
+    """
     checks if the Sudoku's solution is finished
     we loop through the possibilities for each cell
     if all of them has only one, then the Sudoku is solved
     """
     def isFinished(self):
-
+        #if all([len(possibilities) == 1 for possibilities in self.possibilities.items()])
         for coords, possibilities in self.possibilities.items():
             if len(possibilities) > 1:
                 return False
