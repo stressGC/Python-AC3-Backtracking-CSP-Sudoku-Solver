@@ -1,4 +1,5 @@
 import argparse
+import sys
 from sudoku import Sudoku
 
 sudokus = dict(
@@ -6,9 +7,6 @@ sudokus = dict(
     medium = "102004070000902800009003004000240006000107000400068000200800700007501000080400109",
     hard = "002008050000040070480072000008000031600080005570000600000960048090020000030800900"
     )
-
-
-    
 
 if __name__ == "__main__":
     # argument parsing using argparse module
@@ -19,11 +17,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     sudoku_grid_as_string = args.string
+    
 
-    if len(sudoku_grid_as_string) != 81:
-        sudoku_grid_as_string = sudokus["medium"]
+    if sudoku_grid_as_string is None or len(sudoku_grid_as_string) != 81:
+        sudoku_grid_as_string = sudokus["easy"]
     
     sudoku = Sudoku(sudoku_grid_as_string)
-
 
 

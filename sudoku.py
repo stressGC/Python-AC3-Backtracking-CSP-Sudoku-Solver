@@ -1,6 +1,8 @@
 import itertools
+import sys
 
-COORDS = "123456789"
+rows = "123456789"
+cols = "ABCDEFGHI"
 
 class Sudoku:
 
@@ -23,7 +25,7 @@ class Sudoku:
 
         # generating all constraint-related cells for each of them
         self.related_cells = self.generate_related_cells()
-        print(len(self.related_cells))
+
     """
     generates all the coordinates of the cells
     """
@@ -31,12 +33,16 @@ class Sudoku:
 
         all_cells_coords = []
 
-        for a in COORDS:
+        # for A,B,C, ... ,H,I
+        for col in cols:
 
-            for b in COORDS:
-                new_coords = a + b
+            #for 1,2,3 ,... ,8,9
+            for row in rows:
+                
+                # A1, A2, A3, ... , H8, H9
+                new_coords = col + row
                 all_cells_coords.append(new_coords)
-        
+
         return all_cells_coords
 
     """
@@ -50,13 +56,16 @@ class Sudoku:
         default_possibilities = list(range(1,10))
 
         for index, coords in enumerate(self.cells):
-
             # if value is 0, then the cell can have any value in [1, 9]
             if grid_as_list[index] == "0":
                 possibilities[coords] = default_possibilities
             # else value is already defined, possibilities is this value
             else:
                 possibilities[coords] = [int(grid_as_list[index])]
+                count = 0
+        # for x in possibilities:
+        #     count += 1
+        #     print(count , "=>", x, "=>", possibilities[x])
 
         return possibilities
 
@@ -65,33 +74,42 @@ class Sudoku:
     value different from any in row, column or square
     """
     def generate_rules_constraints(self):
-        column_constraints = []
+        
         row_constraints = []
+        column_constraints = []
         square_constraints = []
 
-        for row in COORDS:
-            column_constraints.append([col + row for col in COORDS])
+        # get rows constraints
+        for row in rows:
+            row_constraints.append([col + row for col in cols])
 
-        for col in COORDS:
-            row_constraints.append([col + row for row in COORDS])
+        # get columns constraints
+        for col in cols:
+            column_constraints.append([col + row for row in rows])
 
         # get square constraints
         # how to split coords (non static): 
         # https://stackoverflow.com/questions/9475241/split-string-every-nth-character
-        square_coords = (COORDS[i:i+3] for i in range(0, len(COORDS), 3))
-        square_coords = list(square_coords)
+        rows_square_coords = (cols[i:i+3] for i in range(0, len(rows), 3))
+        rows_square_coords = list(rows_square_coords)
+
+        cols_square_coords = (rows[i:i+3] for i in range(0, len(cols), 3))
+        cols_square_coords = list(cols_square_coords)
 
         # for each square
-        for row in square_coords:
-            for col in square_coords:
+        for row in rows_square_coords:
+            for col in cols_square_coords:
 
-                # and for each value in this square
                 current_square_constraints = []
+                
+                # and for each value in this square
                 for x in row:
                     for y in col:
                         current_square_constraints.append(x + y)
+
                 square_constraints.append(current_square_constraints)
 
+        # all constraints is the sum of these 3 rules
         return row_constraints + column_constraints + square_constraints
 
     """
@@ -155,3 +173,6 @@ class Sudoku:
                 return False
         
         return True
+
+    @staticmethod
+    def constraint(xi, xj): return xi != xj
