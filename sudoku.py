@@ -32,6 +32,11 @@ class Sudoku:
         self.related_cells = dict()
         self.related_cells = self.generate_related_cells()
 
+        #prune
+        self.pruned = dict()
+        self.pruned = {v: list() if grid[i] == '0' else [int(grid[i])] for i, v in enumerate(self.cells)}
+
+
     """
     generates all the coordinates of the cells
     """
@@ -168,9 +173,32 @@ class Sudoku:
     if all of them has only one, then the Sudoku is solved
     """
     def isFinished(self):
-        #if all([len(possibilities) == 1 for possibilities in self.possibilities.items()])
         for coords, possibilities in self.possibilities.items():
             if len(possibilities) > 1:
                 return False
         
         return True
+    
+    """
+    returns a human-readable string
+    """
+    def __str__(self):
+
+        output = ""
+        count = 1
+        
+        # for each cell, print its value
+        for cell in self.cells:
+            
+            output += str(self.possibilities[cell])
+
+            # if we reach the end of the line,
+            # make a new line on display
+            if count >= 9:
+                count = 0
+                output += "\n"
+            
+            count += 1
+        
+        return output
+       

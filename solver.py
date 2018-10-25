@@ -1,49 +1,17 @@
 import argparse
 import sys
 from sudoku import Sudoku
-from utils import is_different
+from ac3 import AC3
+from backtrack import recursive_backtrack_algorithm
 
+"""
+default sudokus' grid
+"""
 sudokus = dict(
     easy = "000079065000003002005060093340050106000000000608020059950010600700600000820390000",
     medium = "102004070000902800009003004000240006000107000400068000200800700007501000080400109",
     hard = "002008050000040070480072000008000031600080005570000600000960048090020000030800900"
     )
-
-# Constraint Propagation with AC-3
-# pseudo code found @ https://en.wikipedia.org/wiki/AC-3_algorithm
-# python implementation found @ http://aima.cs.berkeley.edu/python/csp.html
-def AC3(csp, queue=None):
-
-    if queue == None:
-        queue = list(csp.binary_constraints)
-
-    while queue:
-
-        (xi, xj) = queue.pop(0)
-
-        if remove_inconsistent_values(csp, xi, xj): 
-
-            # if a cell has 0 possibilities, sudoku has no solution
-            if len(csp.possibilities[xi]) == 0:
-                return False
-            
-            for Xk in csp.related_cells[xi]:
-                if Xk != xi:
-                    queue.append((Xk, xi))
-                    
-    return True
-
-def remove_inconsistent_values(csp, xi, xj):
-    "Return true if we remove a value."
-    removed = False
-    for x in csp.possibilities[xi][:]:
-        # if xi=x is in conflict with xj=y for each y, remove xi=x
-        if not any([is_different(x, y) for y in csp.possibilities[xj]]):
-            csp.possibilities[xi].remove(x)
-            removed = True
-
-    return removed
-
 
 if __name__ == "__main__":
     # argument parsing using argparse module
@@ -65,8 +33,30 @@ if __name__ == "__main__":
 
     if not AC3_result:
         print("Sudoku has no solution")
+
     else:
 
-        for i, x in enumerate(sudoku.possibilities):
-            print(i, x, sudoku.possibilities[x])
+        if sudoku.isFinished():
+            print("AC3 was enough to solve this sudoku!")
+
+        else:
+            print("AC3 finished, backtracking starting...")
+
+            assignment = {}
+
+            for x in sudoku.cells:
+                if len(sudoku.possibilities[x]) == 1:
+                    assignment[x] = sudoku.possibilities[x][0]
+            
+            assignment = recursive_backtrack_algorithm(assignment, sudoku)
+            
+            for d in sudoku.possibilities:
+                sudoku.possibilities[d] = assignment[d] if len(d) > 1 else sudoku.possibilities[d]
+            
+            if assignment:
+                print("Result : ")
+                print(sudoku)
+
+            else:
+                print("No solution exists")
     
