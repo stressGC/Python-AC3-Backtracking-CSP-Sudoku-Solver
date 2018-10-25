@@ -1,6 +1,8 @@
 import argparse
 import sys
+
 from sudoku import Sudoku
+from utils import is_different 
 
 sudokus = dict(
     easy = "000079065000003002005060093340050106000000000608020059950010600700600000820390000",
@@ -8,60 +10,46 @@ sudokus = dict(
     hard = "002008050000040070480072000008000031600080005570000600000960048090020000030800900"
     )
 
-def ac3(sudoku):
+"""
+Constraint Propagation with AC-3
+pseudo code found @ https://en.wikipedia.org/wiki/AC-3_algorithm
+python implementation inspired by http://aima.cs.berkeley.edu/python/csp.html
+"""
+def AC3(csp, queue=None):
 
-    queue = list(sudoku.binary_constraints)
+    if queue == None:
+        queue = list(sudoku.binary_constraints)
 
     while queue:
 
-        xi, xj = queue.pop(0)
+        (xi, xj) = queue.pop()
 
-        if revise(sudoku, xi, xj):
+        if remove_inconsistent_values(csp, xi, xj):
 
-            if len(sudoku.possibilities[xi]) == 0:
+            # check if the 
+            if len(csp.possibilities[xi]) == 0:
                 return False
 
-            for xk in sudoku.related_cells[xi]:
-                if xk != xi:
-                    queue.append([xk, xi])
+            for Xk in csp.related_cells[xi]:
+                queue.append((Xk, xi))
 
     return True
 
-@staticmethod
-def constraint(xi, xj): return xi != xj
+"""
+Remove inconsistent values
+returns true if a value is removed
+"""
+def remove_inconsistent_values(csp, xi, xj):
+    removed = False
 
-def revise(sudoku, xi, xj):
+    for x in csp.possibilities[xi][:]:
+        # If xi=x conflicts with xj=y for every possible y, eliminate xi=x
+        # if every(lambda y: not csp.binary_constraints(xi, x, xj, y), csp.possibilities[xj]):
+        if not any([is_different(x, y) for y in csp.possibilities[xj]]):
+            csp.possibilities[xi].remove(x)
+            removed = True 
 
-    revised = False
-
-    for x in sudoku.possibilities[xi]:
-        if not any([sudoku.constraint(x, y) for y in sudoku.possibilities[xj]]):
-            sudoku.possibilities[xi].remove(x)
-            revised = True
-        
-    return revised
-
-# def AC3(csp, queue=None):
-
-#     if queue == None:
-#         queue = list(sudoku.binary_constraints)
-#     while queue:
-#         (Xi, Xj) = queue.pop()
-#         if remove_inconsistent_values(csp, Xi, Xj):
-#             for Xk in csp.related_cells[Xi]:
-#                 queue.append((Xk, Xi))
-
-# def remove_inconsistent_values(csp, Xi, Xj):
-#     "Return true if we remove a value."
-#     removed = False
-#     for x in csp.possibilities[Xi][:]:
-#         # If Xi=x conflicts with Xj=y for every possible y, eliminate Xi=x
-#         # if every(lambda y: not csp.binary_constraints(Xi, x, Xj, y), csp.possibilities[Xj]):
-#         if not any([csp.constraint(x, y) for y in csp.possibilities[Xj]]):
-#             csp.possibilities[Xi].remove(x)
-#             removed = True 
-
-#     return removed
+    return removed
 
 
 if __name__ == "__main__":
@@ -74,15 +62,18 @@ if __name__ == "__main__":
 
     sudoku_grid_as_string = args.string
     
-
     if sudoku_grid_as_string is None or len(sudoku_grid_as_string) != 81:
         sudoku_grid_as_string = sudokus["easy"]
     
     sudoku_grid_as_string = "000079065000003002005060093340050106000000000608020059950010600700600000820390000"
     sudoku = Sudoku(sudoku_grid_as_string)
 
+    AC3_result = AC3(sudoku)
 
-    result = ac3(sudoku)
-    for i, x in enumerate(sudoku.possibilities):
-        print(i, x, sudoku.possibilities[x])
-    print(result)
+    # sudoku has no solution
+    if not AC3_result:
+        print("The sudoku has no solution")
+    
+    else:
+        for i, x in enumerate(sudoku.possibilities):
+            print(x, ",", sudoku.possibilities[x])

@@ -17,131 +17,23 @@ class Sudoku:
         self.possibilities = dict()
         self.binary_constraints = list()
         self.related_cells = dict()
-        #self.pruned = dict()
         
-        # # generation of all the coords of the grid
+        # generation of all the coords of the grid
         self.cells = self.generate_coords()
-        # self.cells = self.combine(characters, numbers)
 
-        # # generation of all the possibilities for each one of these coords
-        # self.possibilities = self.generate_possibilities(grid)
-        self.possibilities = {v: list(range(1, 10)) if game[i] == '0' else [int(game[i])] for i, v in enumerate(self.cells)}
+        # generation of all the possibilities for each one of these coords
+        self.possibilities = self.generate_possibilities(grid)
         
-        # # generation of the line / row / square constraints
+        # generation of the line / row / square constraints
         rule_constraints = self.generate_rules_constraints()
 
-        # # convertion of these constraints to binary constraints
+        # convertion of these constraints to binary constraints
         self.binary_constraints = self.generate_binary_constraints(rule_constraints)
-        # self.build_constraints()
 
-        # # generating all constraint-related cells for each of them
+        # generating all constraint-related cells for each of them
         self.related_cells = self.generate_related_cells()
-        # self.build_neighbors()
         
-
-        # self.pruned = {v: list() if game[i] == '0' else [int(game[i])] for i, v in enumerate(self.cells)}
-
-    def solved(self):
-
-        for v in self.variables:
-            if len(self.domains[v]) > 1:
-                return False
-
-        return True
-
-    def complete(self, assignment):
-
-        for x in self.variables:
-            if len(self.domains[x]) > 1 and x not in assignment:
-                return False
-
-        return True
-
-    def consistent(self, assignment, var, value):
-
-        consistent = True
-
-        for key, val in assignment.items():
-            if val == value and key in self.neighbors[var]:
-                consistent = False
-
-        return consistent
-
-    def assign(self, var, value, assignment):
-
-        assignment[var] = value
-
-        self.forward_check(var, value, assignment)
-
-    def unassign(self, var, assignment):
-
-        if var in assignment:
-
-            for (D, v) in self.pruned[var]:
-                self.domains[D].append(v)
-
-            self.pruned[var] = []
-
-            del assignment[var]
-
-    def forward_check(self, var, value, assignment):
-
-        for neighbor in self.neighbors[var]:
-            if neighbor not in assignment:
-                if value in self.domains[neighbor]:
-                    self.domains[neighbor].remove(value)
-                    self.pruned[var].append((neighbor, value))
-
-    @staticmethod
-    def constraint(xi, xj): return xi != xj
-
-    @staticmethod
-    def combine(alpha, beta):
-        return [a + b for a in alpha for b in beta]
-
-    @staticmethod
-    def permutate(iterable):
-        result = list()
-
-        for L in range(0, len(iterable) + 1):
-            if L == 2:
-                for subset in itertools.permutations(iterable, L):
-                    result.append(subset)
-
-        return result
-
-    @staticmethod
-    def conflicts(sudoku, var, val):
-
-        count = 0
-
-        for n in sudoku.neighbors[var]:
-            if len(sudoku.domains[n]) > 1 and val in sudoku.domains[n]:
-                count += 1
-
-        return count
-
-    def build_constraints(self):
-
-        blocks = (
-            [self.combine(characters, number) for number in numbers] +
-            [self.combine(character, numbers) for character in characters] +
-            [self.combine(character, number) for character in ('ABC', 'DEF', 'GHI') for number in ('123', '456', '789')]
-        )
-
-        for block in blocks:
-            combinations = self.permutate(block)
-            for combination in combinations:
-                if [combination[0], combination[1]] not in self.binary_constraints:
-                    self.binary_constraints.append([combination[0], combination[1]])
-
-    def build_neighbors(self):
-        
-        for x in self.cells:
-            self.related_cells[x] = list()
-            for c in self.binary_constraints:
-                if x == c[0]:
-                    self.related_cells[x].append(c[1])
+    
     """
     generates all the coordinates of the cells
     """
@@ -169,19 +61,14 @@ class Sudoku:
         grid_as_list = list(grid)
 
         possibilities = dict()
-        default_possibilities = list(range(1,10))
 
         for index, coords in enumerate(self.cells):
             # if value is 0, then the cell can have any value in [1, 9]
             if grid_as_list[index] == "0":
-                possibilities[coords] = default_possibilities
+                possibilities[coords] = list(range(1,10))
             # else value is already defined, possibilities is this value
             else:
                 possibilities[coords] = [int(grid_as_list[index])]
-                count = 0
-        # for x in possibilities:
-        #     count += 1
-        #     print(count , "=>", x, "=>", possibilities[x])
 
         return possibilities
 
@@ -289,6 +176,3 @@ class Sudoku:
                 return False
         
         return True
-
-    @staticmethod
-    def constraint(xi, xj): return xi != xj
