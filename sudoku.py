@@ -3,8 +3,6 @@ import sys
 
 rows = "123456789"
 cols = "ABCDEFGHI"
-characters = "ABCDEFGHI"
-numbers = "123456789"
 
 class Sudoku:
 
