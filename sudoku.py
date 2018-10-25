@@ -1,6 +1,7 @@
 import itertools
 import sys
 
+# coordinates idea from @ https://github.com/speix/sudoku-solver/blob/master/sudoku.py
 rows = "123456789"
 cols = "ABCDEFGHI"
 
