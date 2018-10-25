@@ -31,14 +31,6 @@ class Sudoku:
         # generating all constraint-related cells for each of them
         self.related_cells = dict()
         self.related_cells = self.generate_related_cells()
-       
-    def solved(self):
-
-        for v in self.variables:
-            if len(self.domains[v]) > 1:
-                return False
-
-        return True
 
     """
     generates all the coordinates of the cells
