@@ -3,7 +3,7 @@ import sys
 from sudoku import Sudoku
 from ac3 import AC3
 from backtrack import recursive_backtrack_algorithm
-from utils import fetch_sudokus
+from utils import fetch_sudokus, print_grid
 
 """
 default sudokus' grid
@@ -19,7 +19,11 @@ solves a sudoku based on its String grid
 """
 def solve(grid, index, total):
     
-    print("\n{}/{} : AC3 starting".format(index, total))
+    print("\nSudoku {}/{} : \n{}".format(index, total, print_grid(grid)))
+
+
+    print("{}/{} : AC3 starting".format(index, total))
+
 
     # instanciate Sudoku
     sudoku = Sudoku(grid)
