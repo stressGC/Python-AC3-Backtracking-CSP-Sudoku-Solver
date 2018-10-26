@@ -189,8 +189,13 @@ class Sudoku:
         
         # for each cell, print its value
         for cell in self.cells:
-            
-            output += str(self.possibilities[cell])
+
+            # trick to get the right print in case of an AC3-finished sudoku
+            value = str(self.possibilities[cell])
+            if type(self.possibilities[cell]) == list:
+                value = str(self.possibilities[cell][0])
+
+            output += "[" + value + "]"
 
             # if we reach the end of the line,
             # make a new line on display
